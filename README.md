@@ -20,7 +20,7 @@ tags: [ Sommersemester2026, Softwareentwicklung, Übung04]
 
 -->
 
-[![LiaScript Course](https://raw.githubusercontent.com/LiaScript/LiaScript/master/badges/course.svg)](https://liascript.github.io/course/?https://raw.githubusercontent.com/Ifi-Softwareentwicklung-SoSe2026/exercise_04/refs/heads/main/README.md)
+[![LiaScript Course](https://raw.githubusercontent.com/LiaScript/LiaScript/master/badges/course.svg)](https://liascript.github.io/course/?https://raw.githubusercontent.com/Ifi-Softwareentwicklung-SoSe2026/exercise_04/refs/heads//README.md)
 
 #  Aufgabe 04
 
@@ -261,20 +261,37 @@ Himmelskoerper *-- HimmelskoerperTyp : ist vom Typ
 
 Beispiel:
 -------------------
-
+[Website zum Anzeigen der Diagramme] (https://www.planttext.com/)
 ```text @plantUML
 @startuml
-package Raumfahrt {
-  class Raumschiff {
-    + Starten(): void
-  }
+package RoboterDatenverwaltung {
+    interface ISerializer {
+        + {abstract} SpeichernAlsJSON(dateipfad: string): void
+        + {static} {abstract} LadenAusJSON(dateipfad: string): Roboter
+        + {abstract} SpeichernAlsCSV(dateipfad: string): void
+        + {static} {abstract} LadenAusCSV(dateipfad: string): Roboter
+    }
 
-  class Mission {
-    + Planen(): void
-  }
+    class Roboter {
+        + Name: string
+        + Typ: string
+        + Energielevel: int
+        + SpeichernAlsJSON(dateipfad: string): void
+        + {static} LadenAusJSON(dateipfad: string): Roboter
+        + SpeichernAlsCSV(dateipfad: string): void
+        + {static} LadenAusCSV(dateipfad: string): Roboter
+        + <<virtual>> GetStatus(): string
+        + <<virtual>> Activate(): void
+    }
+
+    class Lieferroboter {
+        + Lieferkapazität: int
+        + {override} GetStatus(): string
+    }
+
+    ISerializer <|.. Roboter
+    Roboter <|-- Lieferroboter
 }
-
-Raumschiff --> Mission : nutzt
 @enduml
 ```
 
@@ -424,14 +441,14 @@ Hier bitte den Code aus `robots_exercise` in ein UML Diagramm überführen.
 ```text @plantUML
 @startuml
 package RoboterDatenverwaltung {
-+ interface ISerializer {
+ interface ISerializer {
   + SpeicherAlsJSON(string): void
   + {static}{abstract}LadenAusJSON(string): Roboter
   + SpeicherAlsCSV(string): void
   + {static}{abstract} LadenAusCSV(string): Roboter
 }
 
-+ class Roboter{
+class Roboter{
   + name: string
   + typ: string
   + energielevel: int
@@ -440,19 +457,17 @@ package RoboterDatenverwaltung {
   + SpeichernAlsJSON(string): void
   + {static} LadenAusJSON(string): Roboter
 + {static}GetStatus(): Roboter
-+ {static}Activate(): void
++ Activate(): void
 }
 ISerializer <|.. Roboter
 
-
-+ class Lieferroboter{
+class Lieferroboter{
   + name: string
   + energielevel: int
   + lieferkapazität: int
   + {static} GetStatus(): string
 }
 Roboter <|-- Lieferroboter
-
 }
 
 @enduml
