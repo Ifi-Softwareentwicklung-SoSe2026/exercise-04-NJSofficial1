@@ -262,38 +262,7 @@ Himmelskoerper *-- HimmelskoerperTyp : ist vom Typ
 Beispiel:
 -------------------
 [Website zum Anzeigen der Diagramme] (https://www.planttext.com/)
-```text @plantUML
-@startuml
-package RoboterDatenverwaltung {
-    interface ISerializer {
-        + {abstract} SpeichernAlsJSON(dateipfad: string): void
-        + {static} {abstract} LadenAusJSON(dateipfad: string): Roboter
-        + {abstract} SpeichernAlsCSV(dateipfad: string): void
-        + {static} {abstract} LadenAusCSV(dateipfad: string): Roboter
-    }
 
-    class Roboter {
-        + Name: string
-        + Typ: string
-        + Energielevel: int
-        + SpeichernAlsJSON(dateipfad: string): void
-        + {static} LadenAusJSON(dateipfad: string): Roboter
-        + SpeichernAlsCSV(dateipfad: string): void
-        + {static} LadenAusCSV(dateipfad: string): Roboter
-        + <<virtual>> GetStatus(): string
-        + <<virtual>> Activate(): void
-    }
-
-    class Lieferroboter {
-        + Lieferkapazität: int
-        + {override} GetStatus(): string
-    }
-
-    ISerializer <|.. Roboter
-    Roboter <|-- Lieferroboter
-}
-@enduml
-```
 
 ```text
 @startuml
@@ -441,35 +410,33 @@ Hier bitte den Code aus `robots_exercise` in ein UML Diagramm überführen.
 ```text @plantUML
 @startuml
 package RoboterDatenverwaltung {
- interface ISerializer {
-  + SpeicherAlsJSON(string): void
-  + {static}{abstract}LadenAusJSON(string): Roboter
-  + SpeicherAlsCSV(string): void
-  + {static}{abstract} LadenAusCSV(string): Roboter
-}
+    interface ISerializer {
+        + {abstract} SpeichernAlsJSON(dateipfad: string): void
+        + {static} {abstract} LadenAusJSON(dateipfad: string): Roboter
+        + {abstract} SpeichernAlsCSV(dateipfad: string): void
+        + {static} {abstract} LadenAusCSV(dateipfad: string): Roboter
+    }
 
-class Roboter{
-  + name: string
-  + typ: string
-  + energielevel: int
-  + SpeichernAlsCSV(string): void
-  + {static} LadenAusCSV(string): Roboter
-  + SpeichernAlsJSON(string): void
-  + {static} LadenAusJSON(string): Roboter
-+ {static}GetStatus(): Roboter
-+ Activate(): void
-}
-ISerializer <|.. Roboter
+    class Roboter {
+        + Name: string
+        + Typ: string
+        + Energielevel: int
+        + SpeichernAlsJSON(dateipfad: string): void
+        + {static} LadenAusJSON(dateipfad: string): Roboter
+        + SpeichernAlsCSV(dateipfad: string): void
+        + {static} LadenAusCSV(dateipfad: string): Roboter
+        + <<virtual>> GetStatus(): string
+        + <<virtual>> Activate(): void
+    }
 
-class Lieferroboter{
-  + name: string
-  + energielevel: int
-  + lieferkapazität: int
-  + {static} GetStatus(): string
-}
-Roboter <|-- Lieferroboter
-}
+    class Lieferroboter {
+        + Lieferkapazität: int
+        + {override} GetStatus(): string
+    }
 
+    ISerializer <|.. Roboter
+    Roboter <|-- Lieferroboter
+}
 @enduml
 ```
 @plantUML.eval(png)
