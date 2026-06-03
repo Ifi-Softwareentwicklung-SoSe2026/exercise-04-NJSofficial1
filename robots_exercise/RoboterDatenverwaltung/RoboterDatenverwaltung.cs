@@ -4,15 +4,17 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
-[JsonDerivedType(typeof(Roboter), "roboter")]
+[JsonDerivedType(typeof(Landroboter), "landroboter")]
 [JsonDerivedType(typeof(Lieferroboter), "lieferroboter")]
-public class Roboter : ISerializer
+[JsonDerivedType(typeof(Schwimmroboter), "schwimmroboter")]
+public abstract class Roboter : ISerializer
 {
-    public Roboter(string name, string typ, int energielevel)
+    public Roboter(string name, string typ, int energielevel, int maxGeschwindigkeit)
     {
         Name = name;
         Typ = typ;
         Energielevel = energielevel;
+        MaxGeschwindigkeit = maxGeschwindigkeit;
     }
     public Roboter()
     {
@@ -20,14 +22,19 @@ public class Roboter : ISerializer
         Typ = "Unbekannt";
     }
     public string Name { get; set; }
-    public string Typ { get; set; } // z. B. "Lieferroboter", "Schwimmroboter", etc.
+    public string Typ { get; set; }
     public int Energielevel { get; set; }
+    public int MaxGeschwindigkeit { get; set; }
 
     public void SpeichernAlsCSV(string dateipfad)
     {
         string inhalt = this is Lieferroboter lieferroboter
-            ? $"{Name},{Typ},{Energielevel},{lieferroboter.Lieferkapazität}"
-            : $"{Name},{Typ},{Energielevel}";
+            ? $"{Name},{Typ},{Energielevel},{MaxGeschwindigkeit},{lieferroboter.AnzahlRaeder},{lieferroboter.Lieferkapazität}"
+            : this is Landroboter landroboter
+                ? $"{Name},{Typ},{Energielevel},{MaxGeschwindigkeit},{landroboter.AnzahlRaeder}"
+                : this is Schwimmroboter schwimmroboter
+                    ? $"{Name},{Typ},{Energielevel},{MaxGeschwindigkeit},{schwimmroboter.MaxTauchtiefe}"
+                    : $"{Name},{Typ},{Energielevel},{MaxGeschwindigkeit}";
         File.WriteAllText(dateipfad, inhalt);
     }
 
@@ -39,19 +46,34 @@ public class Roboter : ISerializer
         string name = werte[0];
         string typ = werte[1];
         int energielevel = int.Parse(werte[2]);
+        int maxGeschwindigkeit = int.Parse(werte[3]);
 
-        if (typ == "Lieferroboter" && werte.Length > 3)
+        if (typ == "Lieferroboter")
         {
-            int lieferkapazitaet = int.Parse(werte[3]);
-            return new Lieferroboter(name, energielevel, lieferkapazitaet);
+            int anzahlRaeder = int.Parse(werte[4]);
+            int lieferkapazitaet = int.Parse(werte[5]);
+            return new Lieferroboter(name, energielevel, lieferkapazitaet, maxGeschwindigkeit)
+            {
+                AnzahlRaeder = anzahlRaeder
+            };
         }
 
-        return new Roboter
+        if (typ == "Schwimmroboter")
         {
-            Name = name,
-            Typ = typ,
-            Energielevel = energielevel
-        };
+            int maxTauchtiefe = int.Parse(werte[4]);
+            return new Schwimmroboter(name, energielevel, maxGeschwindigkeit, maxTauchtiefe);
+        }
+
+        if (typ == "Landroboter")
+        {
+            int anzahlRaeder = int.Parse(werte[4]);
+            return new Landroboter(name, typ, energielevel, maxGeschwindigkeit)
+            {
+                AnzahlRaeder = anzahlRaeder
+            };
+        }
+
+        return new Landroboter(name, typ, energielevel, maxGeschwindigkeit);
     }
 
     public void SpeichernAlsJSON(string dateipfad)
@@ -85,14 +107,25 @@ public class Roboter : ISerializer
     }
 }
 
-public class Lieferroboter : Roboter
+public class Landroboter : Roboter
+{
+    public int AnzahlRaeder { get; set; }
+    public Landroboter() : base()
+    {
+    }
+    public Landroboter(string name, string typ, int energielevel, int maxGeschwindigkeit) : base(name, typ, energielevel, maxGeschwindigkeit)
+    {
+    }
+}
+
+public class Lieferroboter : Landroboter
 {
     public int Lieferkapazität { get; set; }
     public Lieferroboter() : base()
     {
         Typ = "Lieferroboter";
     }
-    public Lieferroboter(string name, int energielevel, int lieferkapazität) : base(name, "Lieferroboter", energielevel)
+    public Lieferroboter(string name, int energielevel, int lieferkapazität, int maxGeschwindigkeit) : base(name, "Lieferroboter", energielevel, maxGeschwindigkeit)
     {
         Lieferkapazität = lieferkapazität;
     }
@@ -100,5 +133,19 @@ public class Lieferroboter : Roboter
     public override string GetStatus()
     {
         return $"Lieferroboter - Name: {Name}, Typ: {Typ}, Energielevel: {Energielevel}, Lieferkapazität: {Lieferkapazität}";
+    }
+}
+
+public class Schwimmroboter : Roboter
+{
+    public int MaxTauchtiefe { get; set; }
+    public Schwimmroboter() : base()
+    {
+        Typ = "Schwimmroboter";
+    }
+
+    public Schwimmroboter(string name, int energielevel, int maxGeschwindigkeit, int maxTauchtiefe) : base(name, "Schwimmroboter", energielevel, maxGeschwindigkeit)
+    {
+        MaxTauchtiefe = maxTauchtiefe;
     }
 }

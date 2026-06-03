@@ -7,10 +7,8 @@ class Program
     private static readonly Random RandomGenerator = new();
     private static readonly string[] StandardTypen =
     [
-        "ServiceRoboter",
-        "Schwimmroboter",
-        "Wartungsroboter",
-        "Explorationsroboter"
+        "Landroboter",
+        "Schwimmroboter"
     ];
 
     static void Main(string[] args)
@@ -52,16 +50,29 @@ class Program
     {
         string name = $"Robo_{nummer:D2}";
         int energielevel = RandomGenerator.Next(0, 101);
+        int maxGeschwindigkeit = RandomGenerator.Next(10, 51);
         bool istLieferroboter = RandomGenerator.Next(0, 2) == 1;
 
         if (istLieferroboter)
         {
             int lieferkapazitaet = RandomGenerator.Next(1, 51);
-            return new Lieferroboter(name, energielevel, lieferkapazitaet);
+            var lr = new Lieferroboter(name, energielevel, lieferkapazitaet, maxGeschwindigkeit);
+            lr.AnzahlRaeder = 4;
+            return lr;
         }
 
         string typ = StandardTypen[RandomGenerator.Next(0, StandardTypen.Length)];
-        return new Roboter(name, typ, energielevel);
+        if (typ == "Schwimmroboter")
+        {
+            int maxTauchtiefe = RandomGenerator.Next(5, 101);
+            return new Schwimmroboter(name, energielevel, maxGeschwindigkeit, maxTauchtiefe);
+        }
+        else
+        {
+            var lanr = new Landroboter(name, typ, energielevel, maxGeschwindigkeit);
+            lanr.AnzahlRaeder = 4;
+            return lanr;
+        }
     }
 
     private static void GibStatusAus(IEnumerable<Roboter> roboter)
