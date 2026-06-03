@@ -453,8 +453,6 @@ package RoboterDatenverwaltung {
 
 ```text @plantUML
 @startuml
-
-@startuml
 package RoboterDatenverwaltung {
     interface ISerializer {
         + {abstract} SpeichernAlsJSON(dateipfad: string): void
@@ -495,8 +493,6 @@ package RoboterDatenverwaltung {
     Roboter <|-- Schwimmroboter
     Landroboter <|-- Lieferroboter
 }
-@enduml
-
 @enduml
 ```
 @plantUML.eval(png)
