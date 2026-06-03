@@ -444,13 +444,58 @@ package RoboterDatenverwaltung {
 
 ## Part 2: Überarbeitung des UML Diagrams
 
-Hier soll das überarbeitete UML Diagramm zum Code in `robots_exercise` erstellt werden.
-
+**Begründung der Änderung:**
+  + `Roboter` als abstrakte Klasse, da diese zu allgemein ist, um instanziiert zu werden
+    und Erweiterung dieser um die Eigenschaft `MaxGeschwindigkeit`
+  + Festlegung von `Landroboter` und `Schwimmroboter` als konkrete Robotertypen mit jeweils
+    eigener, instanziierbarer Klasse
+  + Erweiterung dieser beiden Typen um ein jeweils eine sinnvolle Eigenschaft
 
 ```text @plantUML
 @startuml
 
-Arbeiten Sie hier !!!
+@startuml
+package RoboterDatenverwaltung {
+    interface ISerializer {
+        + {abstract} SpeichernAlsJSON(dateipfad: string): void
+        + {static} {abstract} LadenAusJSON(dateipfad: string): Roboter
+        + {abstract} SpeichernAlsCSV(dateipfad: string): void
+        + {static} {abstract} LadenAusCSV(dateipfad: string): Roboter
+    }
+
+    abstract class Roboter {
+        + Name: string
+        + Typ: string
+        + Energielevel: int
+        + MaxGeschwindigkeit: int
+        + SpeichernAlsJSON(dateipfad: string): void
+        + {static} LadenAusJSON(dateipfad: string): Roboter
+        + SpeichernAlsCSV(dateipfad: string): void
+        + {static} LadenAusCSV(dateipfad: string): Roboter
+        + <<virtual>> GetStatus(): string
+        + <<virtual>> Activate(): void
+    }
+    
+    class Landroboter{
+    + AnzahlRaeder: int
+    }
+
+    class Lieferroboter {
+        + Lieferkapazität: int
+        + {override} GetStatus(): string
+    }
+    
+    class Schwimmroboter{
+    + MaxTauchtiefe: int
+    }
+    
+
+    ISerializer <|.. Roboter
+    Roboter <|-- Landroboter
+    Roboter <|-- Schwimmroboter
+    Landroboter <|-- Lieferroboter
+}
+@enduml
 
 @enduml
 ```
